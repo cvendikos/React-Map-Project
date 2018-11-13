@@ -3,6 +3,7 @@ import React, { Component } from "react";
 import "./ProwlFinder.css";
 
 import locations from "./locations.json";
+import cat from "./assets/img/cat-icon.png";
 
 class ProwlFinder extends Component {
   componentDidMount() {
@@ -37,7 +38,15 @@ class ProwlFinder extends Component {
 
   render() {
     return (
-      <div ref="googleMap" className="google-map"></div>
+      <React.Fragment>
+        <div className="sidebar">
+          Hi
+        </div>
+        <div className="header">
+          <img src={cat} className="brand-logo" /> <span>ProwlFinder</span>
+        </div>
+        <div ref="googleMap" className="google-map"></div>
+      </React.Fragment>
     );
   }
 }
