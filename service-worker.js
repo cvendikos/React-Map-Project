@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/React-Map-Project/precache-manifest.222232161f81ead8cfb7e57fd5154bf8.js"
+  "/React-Map-Project/precache-manifest.7af48cc3afed4cacee666055c2c6a16c.js"
 );
 
 workbox.clientsClaim();
