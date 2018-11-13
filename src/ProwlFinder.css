@@ -12,6 +12,7 @@
   position: absolute;
   top: 0;
   left: 0;
+  cursor: pointer;
 }
 
 .header {
@@ -28,8 +29,44 @@
   position: fixed;
   top: 0;
   left: 0;
-  background-color: rgba(0,0,0,0.9);
+  background-color: #FFF;
   z-index: 2;
   width: 450px;
   height: 100%;
+}
+
+.close-sidebar {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 3;
+  color: #000;
+  font-size: 2rem;
+  cursor: pointer;
+}
+
+.sidebar-list {
+  margin: 0;
+  padding: 0;
+  margin-top: 70px;
+}
+
+.sidebar-list li {
+  list-style: none;
+  display: block;
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.sidebar-list li:nth-child(odd) {
+  background-color: #F9F9F9;
+}
+
+.sidebar-list li:nth-child(even) {
+  background-color: #EBEBEB;
+}
+
+.text-bold {
+  font-weight: bold;
 }
