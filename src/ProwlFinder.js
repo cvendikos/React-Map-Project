@@ -1,8 +1,9 @@
 import React, { Component } from "react";
+import debounce from "lodash/debounce";
 
 import "./ProwlFinder.css";
 
-import locations from "./locations.json";
+import allLocations from "./locations.json";
 import cat from "./assets/img/cat-icon.png";
 
 class ProwlFinder extends Component {
@@ -10,14 +11,15 @@ class ProwlFinder extends Component {
     super(props);
 
     this.state = {
-      showSidebar: true,
-      locations: locations
+      showSidebar: false,
+      locations: allLocations
     };
 
     this.toggleSidebar = this.toggleSidebar.bind(this);
+    this.filterLocations = this.filterLocations.bind(this);
   }
 
-  renderMap(mapLocations) {
+  renderMap() {
     const map = new window.google.maps.Map(
       this.refs.googleMap,
       {
@@ -30,7 +32,7 @@ class ProwlFinder extends Component {
 
     const bounds = new window.google.maps.LatLngBounds();
 
-    locations.forEach((location) => {
+    this.state.locations.forEach((location) => {
       let marker = new window.google.maps.Marker(
         {
           position: {
@@ -48,13 +50,35 @@ class ProwlFinder extends Component {
   }
 
   componentDidMount() {
-    this.renderMap(this.state.locations);
+    this.renderMap();
   }
 
   toggleSidebar() {
     this.setState({
       showSidebar: this.state.showSidebar ? false : true
     });
+  }
+
+  filterLocations(event) {
+    if (event.target.value === "") {
+      return this.setState({
+        locations: allLocations
+      }, debounce(this.renderMap, 1000));
+    }
+
+    const newLocations = allLocations.filter((l) => {
+      let searchRegex = new RegExp(event.target.value, "gi");
+
+      if (searchRegex.test(l.name) || searchRegex.test(l.features)) {
+        return true;
+      }
+
+      return false;
+    });
+
+    this.setState({
+      locations: newLocations
+    }, debounce(this.renderMap, 1000));
   }
 
   render() {
@@ -64,10 +88,12 @@ class ProwlFinder extends Component {
           <div className="sidebar">
             <i onClick={this.toggleSidebar} className="fa fa-remove close-sidebar"></i>
 
+            <input onChange={this.filterLocations} type="text" className="search-input" placeholder="Filter results..." />
+
             <ul className="sidebar-list">
-              { this.state.locations.map((location) => {
+              { this.state.locations.map((location, index) => {
                 return (
-                  <li>
+                  <li key={index}>
                     <div className="text-bold">
                       {location.name}
                     </div>
@@ -82,7 +108,7 @@ class ProwlFinder extends Component {
         : null }
 
         <div className="header">
-          <img onClick={this.toggleSidebar} src={cat} className="brand-logo" /> <span>ProwlFinder</span>
+          <img onClick={this.toggleSidebar} src={cat} className="brand-logo" alt="Logo" /> <span>ProwlFinder</span>
         </div>
         <div ref="googleMap" className="google-map"></div>
       </React.Fragment>
