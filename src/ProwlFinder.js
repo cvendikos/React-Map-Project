@@ -12,14 +12,16 @@ class ProwlFinder extends Component {
 
     this.state = {
       showSidebar: false,
-      locations: allLocations
+      locations: allLocations,
+      filteredLocations: [],
+      map: {}
     };
 
     this.toggleSidebar = this.toggleSidebar.bind(this);
     this.filterLocations = this.filterLocations.bind(this);
   }
 
-  renderMap() {
+  componentDidMount() {
     const map = new window.google.maps.Map(
       this.refs.googleMap,
       {
@@ -32,25 +34,31 @@ class ProwlFinder extends Component {
 
     const bounds = new window.google.maps.LatLngBounds();
 
-    this.state.locations.forEach((location) => {
+    const locationsWithMarkers = this.state.locations.map((location) => {
       let marker = new window.google.maps.Marker(
         {
           position: {
             lat: location.lat,
             lng: location.lng
           },
-          map: map
+          map: map,
+          animation: window.google.maps.Animation.DROP
         }
       );
 
       bounds.extend(marker.position);
+
+      location["marker"] = marker;
+
+      return location;
+    });
+
+    this.setState({
+      locations: locationsWithMarkers,
+      map: map
     });
 
     map.fitBounds(bounds);
-  }
-
-  componentDidMount() {
-    this.renderMap();
   }
 
   toggleSidebar() {
@@ -61,27 +69,42 @@ class ProwlFinder extends Component {
 
   filterLocations(event) {
     if (event.target.value === "") {
+      this.state.locations.forEach((l) => {
+        l.marker.setMap(this.state.map);
+      });
+
       return this.setState({
-        locations: allLocations
-      }, debounce(this.renderMap, 1000));
+        filteredLocations: []
+      });
     }
 
-    const newLocations = allLocations.filter((l) => {
+    const newLocations = this.state.locations.filter((l) => {
       let searchRegex = new RegExp(event.target.value, "gi");
 
       if (searchRegex.test(l.name) || searchRegex.test(l.features)) {
+        l.marker.setMap(this.state.map);
         return true;
       }
+
+      l.marker.setMap(null);
 
       return false;
     });
 
     this.setState({
-      locations: newLocations
-    }, debounce(this.renderMap, 1000));
+      filteredLocations: newLocations
+    });
   }
 
   render() {
+    let filteredLocations;
+
+    if (this.state.filteredLocations.length) {
+      filteredLocations = this.state.filteredLocations;
+    } else {
+      filteredLocations = this.state.locations;
+    }
+
     return (
       <React.Fragment>
         { this.state.showSidebar ?
@@ -91,7 +114,7 @@ class ProwlFinder extends Component {
             <input onChange={this.filterLocations} type="text" className="search-input" placeholder="Filter results..." />
 
             <ul className="sidebar-list">
-              { this.state.locations.map((location, index) => {
+              { filteredLocations.map((location, index) => {
                 return (
                   <li key={index}>
                     <div className="text-bold">
