@@ -63,6 +63,7 @@
   width: 100%;
   padding: 20px;
   box-sizing: border-box;
+  cursor: pointer;
 }
 
 .sidebar-list li:nth-child(odd) {
